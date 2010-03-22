@@ -2,7 +2,7 @@
 
 from django.core.management.base import NoArgsCommand, BaseCommand
 
-from jobs.worker import unregister
+from butler.slave.worker import unregister
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):

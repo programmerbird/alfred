@@ -98,22 +98,21 @@ DATABASE_USER = 'alfred'
 DATABASE_PASSWORD = 'sfkljwr90l;sd'
 DATABASE_HOST = '127.0.0.1'
 
-JOBS_HUB_URL = 'boatyardhub.appspot.com'
-
-BUTLER_SECRET = 'asdf0pk234lsd'
-BUTLER_NAME = 'alfred1'
-BUTLER_ENDPOINT = 'alfred1.boatyardapp.com'
-BUTLER_APPS_DIRECTORY = '/home/alfred/apps/'
-BUTLER_SETTINGS = 'settings'
-
-
 INSTALLED_APPS += (
 	'django.contrib.markup',
-	'south',
 	'django.contrib.admin',
-	'jobs', 
-	'master', 
-	'slave',
+	'south',
+	'butler.jobs', 
+	'butler.master', 
+	'butler.slave',
 )
+
+
+BUTLER_NAME = 'alfred1'
+BUTLER_HUB_URL = 'http://boatyardhub.appspot.com/'
+BUTLER_MASTER_URL = 'http://alfred.boatyardapp.com/'
+BUTLER_VIRTUALENV = os.path.join(os.path.dirname(__file__), 'env')
+BUTLER_APPS_DIRECTORY = os.path.join(os.path.dirname(__file__), 'services')
+
 
 

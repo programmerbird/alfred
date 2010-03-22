@@ -5,7 +5,6 @@ from django.conf import settings
 
 import worker
 
-BUTLER_APPLICATIONS = getattr(settings, 'BUTLER_APPLICATIONS', [])
 def callback(request, application):
 	if request.method == 'GET':
 		mode = request.GET['hub.mode']
@@ -14,7 +13,9 @@ def callback(request, application):
 		lease_seconds = request.GET.get('hub.lease_seconds')
 		verify_token = request.GET.get('hub.verify_token', '')
 		if mode == 'subscribe':
-			if application not in BUTLER_APPLICATIONS:
+			from worker import get_applications
+			applications = get_applications()
+			if application not in applications:
 				raise Http404 
 			if verify_token != worker.get_application_key(application):
 				raise Http404

@@ -6,8 +6,7 @@ from django.db import models
 from django.db.models import signals
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from hibird.utils import random_string
-
+from utils import random_string
 
 class AccessKey(models.Model):
 	user = models.ForeignKey(User, primary_key=True)

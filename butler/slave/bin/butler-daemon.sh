@@ -1,9 +1,9 @@
 #!/bin/sh
 
-SETTINGS=$1
+VIRTUALENV=$1
+SETTINGS=$2
 CALLDIR=$(dirname $(readlink -f $0))
-BASEDIR=$(dirname $(dirname $CALLDIR))
-ALFRED="$CALLDIR/butler-cmd.sh $BASEDIR $SETTINGS"
+ALFRED="$CALLDIR/butler-cmd.sh $VIRTUALENV $SETTINGS"
 
 BUTLER_NAME=`$ALFRED get settings.BUTLER_NAME`
 PROCESS_NAME=alfred-$BUTLER_NAME 

@@ -2,8 +2,8 @@
 
 from django.core.management.base import NoArgsCommand, BaseCommand
 
-from slave.worker import get_current_butler
-from jobs.models import ERROR 
+from butler.slave.worker import get_current_butler
+from butler.jobs.models import ERROR 
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):

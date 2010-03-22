@@ -2,7 +2,7 @@
 
 from django.core.management.base import NoArgsCommand, BaseCommand
 from django.conf import settings
-from slave.worker import get_current_butler
+from butler.slave.worker import get_current_butler
 import os 
 
 BUTLER_APPS_DIRECTORY = getattr(settings, 'BUTLER_APPS_DIRECTORY')

@@ -2,9 +2,10 @@
 
 from django.core.management.base import NoArgsCommand, BaseCommand
 
-from slave.worker import get_current_butler, start_worker
+from butler.jobs.worker import register, start_worker
 
 class Command(BaseCommand):
 	def handle(self, *args, **kwargs):
+		register()
 		start_worker()
 
