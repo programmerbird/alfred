@@ -1,0 +1,31 @@
+{% load i18n %}
+{% ifequal request.method "POST" %}
+<div class="errors">
+	<h4>{% trans "Ooops! We Have Problems." %}</h4>
+	{% autoescape off %}
+	{% if form.non_field_errors %}
+	<p>{{ form.non_field_errors }}</p>
+	{% endif %}
+	{% endautoescape %}
+</div>
+{% else %}
+{% ifequal request.method "GET" %}
+	{% if request.GET.error %}
+	<div class="errors">
+		<h4>{% trans "Ooops! We Have Problems." %}</h4>
+	
+		{% autoescape off %}
+		<p>{{ request.GET.error }}</p>
+		{% endautoescape %}
+	</div>
+	{% else %}
+		{% if error %}
+		<div class="errors">
+			<h4>{% trans "Ooops! We Have Problems." %}</h4>
+	
+			<p>{{ error }}</p>
+		</div>
+		{% endif %}
+	{% endif %}
+{% endifequal %}
+{% endifequal %}
