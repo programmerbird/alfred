@@ -20,7 +20,7 @@ def callback(request, application):
 				raise Http404
 		return HttpResponse(challenge, content_type='text/plain')
 	elif request.method == 'POST':
-		worker.fetch_and_run_job()
+		worker.start_worker()
 		return HttpResponse('')
 	return Http404
 

@@ -5,8 +5,6 @@ from django.db import models
 from django.db.models import signals
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-from hibird.utils import permission
-from hibird.models import slugify
 
 
 NEW = "new"
@@ -17,7 +15,7 @@ HOLD = "hold"
 ERROR = "error"
 JOB_STATUS = (
 	(NEW, _("New")),
-	(Queue, _("Assigned")),
+	(QUEUE, _("Assigned")),
 	(HOLD, _("On hold")),
 	(PROCESS, _("Processing")),
 	(DONE, _("Done")),
@@ -32,14 +30,14 @@ class Job (models.Model):
 	created_on = models.DateTimeField(auto_now_add=True)
 	updated_on = models.DateTimeField(auto_now=True)
 	
-	application = models.CharField(max_length=200, index=True)
+	application = models.CharField(max_length=200, db_index=True)
 	options = models.TextField(null=True, blank=True)
 	callback_url = models.CharField(max_length=200, null=True, editable=False)
 	
 	status = models.CharField(max_length=10, choices=JOB_STATUS, default=NEW, editable=False)	
 	
 	secret = models.CharField(max_length=20, editable=False)
-	butler = models.ForeignKey(Butler, null=True, editable=False)
+	butler = models.ForeignKey('Butler', null=True, editable=False)
 
 	def _manage_secret(self):
 		if not self.secret:
@@ -85,7 +83,7 @@ class Butler (models.Model):
 	secret = models.CharField(max_length=20, editable=False)
 	
 	applications = models.TextField(null=True, blank=True)
-	current_job = models.ForeignKey(Job, null=True, blank=True)
+	current_job = models.ForeignKey(Job, null=True, blank=True, related_name='current_butler')
 	
 	def _manage_secret(self):
 		if not self.secret:
@@ -130,6 +128,8 @@ class Butler (models.Model):
 		transaction.set_dirty()
 
 	def _fetch_job(self):
+		if self.current_job:
+			return self.current_job
 		jobs = Job.objects.filter(butler=self, status__in=WORKING_STATUS).order_by('-pk')[:1]
 		if jobs: 
 			return jobs[0]

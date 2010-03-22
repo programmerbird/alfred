@@ -11,7 +11,7 @@ from hibird.utils import random_string
 
 class AccessKey(models.Model):
 	user = models.ForeignKey(User, primary_key=True)
-	key = models.CharField(max_length=32, index=True)
+	key = models.CharField(max_length=32, db_index=True)
 	secret_key = models.CharField(max_length=32)
 	
 	@classmethod
@@ -27,3 +27,20 @@ class AccessKey(models.Model):
 	def save(self, *args, **kwargs):
 		self._manage_key()
 		super(AccessKey, self).save(*args, **kwargs)
+		
+class Authorization(models.Model):	
+	user = models.ForeignKey(User, db_index=True)
+	application = models.CharField(max_length=200)
+	created_on = models.DateTimeField(auto_now_add=True)
+	
+	@classmethod
+	def exists(cls, user, application):
+		if user.is_superuser:
+			return True 
+		else:
+			records = Authorization.objects.filter(user=user, application=application)
+			if records:
+				return True 
+			return False
+			
+	

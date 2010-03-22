@@ -11,7 +11,6 @@ INSTALLED_APPS = (
 	'django.contrib.contenttypes',
 	'django.contrib.sessions',
 	'django.contrib.sites',
-	'django.contrib.flatpages',
 )
 TEMPLATE_CONTEXT_PROCESSORS = (
 	'django.core.context_processors.auth',
@@ -35,7 +34,6 @@ MIDDLEWARE_CLASSES = (
 	'django.middleware.locale.LocaleMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.middleware.doc.XViewMiddleware',
-	'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
 )
 
 # List of callables that know how to import templates from various sources.
@@ -74,7 +72,7 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-INTERNAL_IPS = ('127.0.0.1', )
+INTERNAL_IPS = ('127.0.0.1',)
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -92,26 +90,30 @@ LANGUAGES = (
 	('en', 'English'),
 )
 DEFAULT_LANGUAGE = 'en'
-_=lambda (x) : x
 
 # [database]
-# On Linux, using mysql
 DATABASE_ENGINE = 'mysql'
 DATABASE_NAME = 'alfred'
 DATABASE_USER = 'alfred'
 DATABASE_PASSWORD = 'sfkljwr90l;sd'
 DATABASE_HOST = '127.0.0.1'
 
-# [markup]
+JOBS_HUB_URL = 'boatyardhub.appspot.com'
+
+BUTLER_SECRET = 'asdf0pk234lsd'
+BUTLER_NAME = 'alfred1'
+BUTLER_ENDPOINT = 'alfred1.boatyardapp.com'
+BUTLER_APPS_DIRECTORY = '/home/alfred/apps/'
+BUTLER_SETTINGS = 'settings'
+
+
 INSTALLED_APPS += (
 	'django.contrib.markup',
 	'south',
 	'django.contrib.admin',
-	'page',
+	'jobs', 
+	'master', 
+	'slave',
 )
 
-JOBS_HUB_URL = 'boatyardhub.appspot.com'
-BUTLER_SECRET = 'asdf0pk234lsd'
-BUTLER_ENDPOINT = 'alfred.boatyardapp.com'
-BUTLER_APPLICATION_DIRECTORY = '/home/alfred/apps/'
 
