@@ -6,15 +6,17 @@ from django.db import models
 from django.db.models import signals
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import signals
+
 from utils import random_string
 
 class AccessKey(models.Model):
-	user = models.ForeignKey(User, primary_key=True)
-	key = models.CharField(max_length=32, db_index=True)
+	user = models.ForeignKey(User, primary_key=True, editable=False)
+	key = models.CharField(max_length=32, unique=True)
 	secret_key = models.CharField(max_length=32)
 	
 	@classmethod
-	def by_user(user):
+	def by_user(cls, user):
 		accesskey,is_created = AccessKey.objects.get_or_create(user=user)
 		return accesskey 
 
@@ -41,5 +43,4 @@ class Authorization(models.Model):
 			if records:
 				return True 
 			return False
-			
-	
+

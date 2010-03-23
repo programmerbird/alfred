@@ -1,38 +1,45 @@
 #-*- coding:utf-8 -*-
 
-from django.contrib.syndication.feeds import Feed, FeedDoesNotExist
-from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse, Http404
 from django.utils.translation import ugettext_lazy as _
-from django.utils.feedgenerator import Atom1Feed
-from django.conf import settings 
-from butler.jobs.models import *
-
-COMPANY_NAME = getattr(settings, 'COMPANY_NAME')
-
-class JobsFeed(Feed):
-
-	feed_type = Atom1Feed
-	title_template = "butler/feed/job/title.html"
-	description_template = "butler/feed/job/description.html"
+from django.utils import simplejson
+from django.conf import settings
+from butler.jobs.models import Job
+from models import *
+import forms 
+from utils import render_to, raise_form_error
 	
-	def get_object(self, bits):
-		if len(bits) < 1:
-			raise ObjectDoesNotExist
-		application = bits[0]
-		return application
+@render_to('butler/job/new.html')
+def new_job(request):
+	try:
+		output = request.GET.get('output')
+		if request.method=='GET':
+			form = forms.JobForm()
 			
-	def title(self, obj):
-		return COMPANY_NAME + ": " + unicode(obj)
-	
-	def link(self, obj):
-		return application
-
-	def description(self, obj):
-		return "Recent %s jobs" % unicode(obj)
-	
-	def subtitle(self, obj):
-		return self.description(obj)
+		if request.method=='POST':
+			form = forms.JobForm(data=request.POST)
+			if form.is_valid():
+				n = form.save(commit=False)
+				n.save()
+				return HttpResponse(simplejson.dumps({
+					'pk': n.pk, 
+					'secret': n.secret, 
+					'status': n.status,
+				}))
+			else:
+				if output != 'form':
+					raise_form_error(form)
+	except Exception, e:
+		error = unicode(e)
+		if output == 'form':
+			form.non_fields_error = error
+		else:
+			return HttpResponse(simplejson.dumps({
+				'error': unicode(e), 
+			}), status=400)
 		
-	def items(self, obj):
-		return Job.objects.filter(application=obj, status=NEW, butler__isnull=True).order_by('-pk')[:20]
+	return locals()
+
+def job(request, job_id):
+	pass 
 	

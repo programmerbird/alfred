@@ -1,11 +1,17 @@
 #-*- coding:utf-8 -*-
 
 from django.conf.urls.defaults import *
-from views import JobsFeed
+from admin import butler_admin
+from feeds import JobsFeed
 
 urlpatterns = patterns('',
-	('(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': 
-		'job': JobsFeed,		
-	}),
+	('^admin/', include(butler_admin.urls)),
+	('^new/job/', 'butler.master.views.new_job'),
+	
+	('(?P<url>.*)/$', 'django.contrib.syndication.views.feed', 
+		{'feed_dict': 
+			{'job': JobsFeed},		
+		}
+	),
 )
 

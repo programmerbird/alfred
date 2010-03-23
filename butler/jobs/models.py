@@ -5,7 +5,7 @@ from django.db import models
 from django.db.models import signals
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
-
+from django.utils import simplejson
 
 NEW = "new"
 QUEUE = "que"
@@ -32,7 +32,7 @@ class Job (models.Model):
 	
 	application = models.CharField(max_length=200, db_index=True)
 	options = models.TextField(null=True, blank=True)
-	callback_url = models.CharField(max_length=200, null=True, editable=False)
+	callback = models.CharField(max_length=200, null=True, blank=True)
 	
 	status = models.CharField(max_length=10, choices=JOB_STATUS, default=NEW, editable=False)	
 	
@@ -43,7 +43,12 @@ class Job (models.Model):
 		if not self.secret:
 			self.secret = random_string(20)
 			
+	def _manage_name(self):
+		if not self.name:
+			self.name = self.application 
+			
 	def save(self, *args, **kwargs):
+		self._manage_name()
 		self._manage_secret()
 		super(Job, self).save(*args, **kwargs)
 		
@@ -51,11 +56,11 @@ class Job (models.Model):
 		import publisher 
 		publisher.publish(job)
 		
-	def params(self):
+	def json(self):
 		try:
-			return self._params
+			return self._json
 		except AttributeError:
-			self._params = t = json.loads(self.options or '{}')
+			self._json = t = simplejson.loads(self.options or '{}')
 			return t
 			
 	def complete(self):
@@ -70,6 +75,9 @@ class Job (models.Model):
 		self.status = ERROR 
 		self.save()
 		self.complete()
+		
+	def __unicode__(self):
+		return self.name 
 		
 class Log (models.Model):
 	job = models.ForeignKey(Job, null=True, blank=True)
