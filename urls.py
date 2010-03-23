@@ -6,8 +6,8 @@ import os
 
 # [butler]
 urlpatterns = patterns('', 
-	('^master/', include('butler.master.urls')),
 	('^slave/', include('butler.slave.urls')),
+	('', include('butler.master.urls')),
 )
 
 # [admin]

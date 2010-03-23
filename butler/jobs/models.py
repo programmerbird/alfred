@@ -6,6 +6,7 @@ from django.db.models import signals
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils import simplejson
+from utils import random_string
 
 NEW = "new"
 QUEUE = "que"
@@ -22,10 +23,10 @@ JOB_STATUS = (
 	(ERROR, _("Error")),
 )
 
-WORKING_STATUS = (QUEUE, PROCESS,)
+WORKING_STATUS = (NEW, QUEUE, PROCESS,)
 CLOSED_STATUS = (DONE, ERROR,)
 class Job (models.Model):	
-	name = models.CharField(verbose_name=_("Task name"), max_length=200)
+	name = models.CharField(verbose_name=_("Task name"), max_length=200, blank=True)
 	owner = models.ForeignKey(User, null=True, related_name="task_owned")
 	created_on = models.DateTimeField(auto_now_add=True)
 	updated_on = models.DateTimeField(auto_now=True)
@@ -34,7 +35,7 @@ class Job (models.Model):
 	options = models.TextField(null=True, blank=True)
 	callback = models.CharField(max_length=200, null=True, blank=True)
 	
-	status = models.CharField(max_length=10, choices=JOB_STATUS, default=NEW, editable=False)	
+	status = models.CharField(max_length=10, choices=JOB_STATUS, default=NEW)	
 	
 	secret = models.CharField(max_length=20, editable=False)
 	butler = models.ForeignKey('Butler', null=True, editable=False)
@@ -67,7 +68,7 @@ class Job (models.Model):
 		pass 
 	
 	def success(self):
-		self.status = CLOSED 
+		self.status = DONE 
 		self.save()
 		self.complete()
 		
@@ -93,6 +94,9 @@ class Butler (models.Model):
 	applications = models.TextField(null=True, blank=True)
 	current_job = models.ForeignKey(Job, null=True, blank=True, related_name='current_butler')
 	
+	def __unicode__(self):
+		return self.endpoint
+		
 	def _manage_secret(self):
 		if not self.secret:
 			self.secret = random_string(20)
@@ -105,10 +109,12 @@ class Butler (models.Model):
 		try:
 			return self._applications
 		except AttributeError:
+			if not self.applications:
+				self.applications = ''
 			self._applications = apps = self.applications.split('\n')
 			return apps 			
 	
-	def output(text):
+	def output(self, text):
 		l = Log()
 		l.butler = self
 		l.job = self.current_job 
@@ -118,22 +124,20 @@ class Butler (models.Model):
 	def _assign_job(self):
 		from django.db import connection, transaction
 		cursor = connection.cursor()
-		application
+		apps = self.get_applications()
+		apps_sql = ' OR '.join(['application=%s' for x in apps ])
 		sql = """
 			UPDATE jobs_job 
 			SET butler_id=%s, status=%s 
-			WHERE application IN %s
-				AND status=%s
+			WHERE status=%s
+				AND (""" + apps_sql + """)
 				AND butler_id IS NULL
 			ORDER BY id DESC
 			LIMIT 1
 		"""
 		cursor.execute(sql, [
-			self.pk, QUEUE,
-			self.get_applications(), 
-			NEW,
-		]) 
-		transaction.set_dirty()
+			self.pk, QUEUE, NEW,
+		] + apps ) 
 
 	def _fetch_job(self):
 		if self.current_job:

@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Butler: {{ butler }}</title>
+{% ifequal job.status "proc" %}
+<meta http-equiv="refresh" content="2;url={{ request.path }}" />
+{% endifequal %}
+{% ifequal job.status "que" %}
+<meta http-equiv="refresh" content="2;url={{ request.path }}" />
+{% endifequal %}
+<style type="text/css" media="screen">
+/* <![CDATA[ */
+	body { margin: 0;font-size: 100%; 
+		font-family : Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;}
+	#content { width: 420px; margin: 50px auto 0; padding: 20px }
+	pre { background: #eee; padding: 20px; margin: 10px 0 }
+/* ]]> */
+</style>
+</head>
+<body>
+<div id="content">
+<h1>{{ butler }}</h1>
+<h2>Current Job</h2>
+<pre>
+Job ID: {{ job.pk }}
+Job Application: {{ job.application }}
+Job Status: {{ job.status }}
+Job Options: {{ job.options }}
+</pre>
+<form method="POST">
+	<div class="submit field">
+		<button type="submit" class="big positive button">Fetch & Run</button>
+		<a href="{{ post_url }}">Post a Job</a>
+	</div>
+</form>
+<hr />
+<h2>Applications</h2>
+<ul>
+{% for entry in applications %}
+<li>{{ entry }}</li>
+{% endfor %}
+</ul>
+</div>
+</body>
+</html>

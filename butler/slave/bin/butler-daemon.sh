@@ -1,11 +1,6 @@
 #!/bin/sh
 
-VIRTUALENV=$1
-SETTINGS=$2
-CALLDIR=$(dirname $(readlink -f $0))
-ALFRED="$CALLDIR/butler-cmd.sh $VIRTUALENV $SETTINGS"
-
-BUTLER_NAME=`$ALFRED get settings.BUTLER_NAME`
+BUTLER_NAME=`alfred get settings.BUTLER_NAME`
 PROCESS_NAME=alfred-$BUTLER_NAME 
 LOCK_FILE=/tmp/$PROCESS_NAME.lock
 
@@ -24,11 +19,12 @@ fi
 
 echo $$ > $LOCK_FILE
 
-
-APP=`$ALFRED fetch`
+APP=`alfred fetch`
 while [ -n "$APP" ]; do
-	$APP "$1"
-	APP=`$ALFRED fetch`
+	alfred status proc
+	$APP 
+	sleep 1
+	APP=`alfred fetch`
 done
 
 

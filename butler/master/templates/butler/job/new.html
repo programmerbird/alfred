@@ -2,19 +2,24 @@
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
+<title>Post a Job</titl>
 <style type="text/css" media="screen">
 /* <![CDATA[ */
 	label { display: block }
-	input, textarea { width: 400px; border: 1px solid #ccc; font-size: 140% }
+	input, textarea { width: 400px; border: 1px solid #ccc; font-size: 140%; 
+		background: #fff; color: #333; }
 	textarea { max-width: 397px }
 	.field { margin-bottom: 10px }
+	body { margin: 0;font-size: 100%; 
+		font-family : Arial, Helvetica, "Nimbus Sans L", "Liberation Sans", FreeSans, Sans-serif;}
+	#content { width: 420px; margin: 50px auto 0; padding: 20px }
 /* ]]> */
 </style>
-
 </head>
 <body>
-
+	<div id="content">
 	<form method="POST" action="{{ request.path }}?output=form">
+		<h1>Post a job</h1>
 		{% if form.non_fields_error %}
 			{{ form.non_fields_error }}
 		{% endif %}
@@ -30,5 +35,6 @@
 		<button type="submit" class="big positive button">Submit</button>
 		</div>
 	</form>
+	</div>
 </body>
 </html>

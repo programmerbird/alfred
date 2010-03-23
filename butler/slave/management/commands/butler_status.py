@@ -9,9 +9,6 @@ class Command(BaseCommand):
 		butler = get_current_butler()
 		job = butler.current_job
 		if job:
-			job.success()
-			
-			butler.current_job = None 
-			butler.save()	
-		
+			job.status = args[0]
+			job.save()
 

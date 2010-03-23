@@ -1,5 +1,6 @@
 #-*- coding:utf-8 -*-
 
+import hashlib 
 
 from django.contrib.auth.models import User
 from django.db import models
@@ -15,6 +16,10 @@ class AccessKey(models.Model):
 	key = models.CharField(max_length=32, unique=True)
 	secret_key = models.CharField(max_length=32)
 	
+	def check_sum(self, txt):
+		token = "%s!%s" % (self.secret_key, txt)
+		return hashlib.sha1(token).hexdigest()
+		
 	@classmethod
 	def by_user(cls, user):
 		accesskey,is_created = AccessKey.objects.get_or_create(user=user)

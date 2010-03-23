@@ -9,6 +9,7 @@ from butler.jobs import models
 
 SETTINGS_MODULE = getattr(settings, 'SETTINGS_MODULE', 'settings')
 
+BUTLER_MANAGE_DIRECTORY = getattr(settings, 'BUTLER_MANAGE_DIRECTORY')
 BUTLER_VIRTUALENV = getattr(settings, 'BUTLER_VIRTUALENV')
 BUTLER_APPS_DIRECTORY = getattr(settings, 'BUTLER_APPS_DIRECTORY', '/home/alfred/apps')
 BUTLER_LEASE_SECONDS = getattr(settings, 'BUTLER_LEASE_SECONDS', 259200) # 3 days in seconds
@@ -27,16 +28,16 @@ def get_endpoint():
 	
 def get_applications():
 	import os
-	apps = [x for x in os.listdir(BUTLER_APPS_DIRECTORY) if x and x[:1] not in ('.', '_')]
+	apps = [x for x in os.listdir(BUTLER_APPS_DIRECTORY) if x and x[:1] not in ('.','_',) and x[-1:] not in ('~',)]
 	apps.sort()
 	return apps 
 
 def register():
 	endpoint = get_endpoint()
-	butler, is_created = Butler.objects.get_or_create(endpoint=endpoint)
+	butler, is_created = models.Butler.objects.get_or_create(endpoint=endpoint)
 	
 	apps = '\n'.join(get_applications())
-	butler.applications = '\n'.join(apps)
+	butler.applications = apps
 	butler.save()
 	
 	# pubsubhubbub subscribe!
@@ -52,7 +53,7 @@ def register():
 	
 def unregister(butler=None):
 	endpoint = get_endpoint()
-	butler, is_created = Butler.objects.get_or_create(endpoint=endpoint)
+	butler, is_created = models.Butler.objects.get_or_create(endpoint=endpoint)
 	butler.applications = ''
 	butler.save()
 
@@ -61,11 +62,11 @@ def unregister(butler=None):
 	
 def get_current_butler():
 	endpoint = get_endpoint()
-	butler, is_created = Butler.objects.get_or_create(endpoint=endpoint)
+	butler, is_created = models.Butler.objects.get_or_create(endpoint=endpoint)
 	return butler
 	
 def start_worker():
 	import os, subprocess 
 	daemon = os.path.abspath(os.path.join(__file__, '../bin/start-butler-daemon.sh'))
-	subprocess.Popen(['/bin/sh', daemon, BUTLER_VIRTUALENV, SETTINGS_MODULE]).communicate(0)
+	subprocess.Popen(['/bin/sh', daemon, BUTLER_VIRTUALENV, BUTLER_MANAGE_DIRECTORY, SETTINGS_MODULE]).communicate(0)
 

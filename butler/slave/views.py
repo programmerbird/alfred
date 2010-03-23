@@ -2,8 +2,10 @@
 
 from django.http import HttpResponse, Http404
 from django.conf import settings
-
+from utils import render_to
 import worker
+
+BUTLER_MASTER_URL = getattr(settings, 'BUTLER_MASTER_URL')
 
 def callback(request, application):
 	if request.method == 'GET':
@@ -25,3 +27,13 @@ def callback(request, application):
 		return HttpResponse('')
 	return Http404
 
+@render_to('butler/job/debug.html')
+def debug(request):
+	if request.method == 'POST':
+		worker.start_worker()
+	butler = worker.get_current_butler()
+	job = butler.current_job 
+	applications = worker.get_applications()
+	
+	post_url = BUTLER_MASTER_URL + "new/job/"
+	return locals()

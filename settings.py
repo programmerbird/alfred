@@ -110,9 +110,8 @@ INSTALLED_APPS += (
 
 BUTLER_NAME = 'alfred1'
 BUTLER_HUB_URL = 'http://boatyardhub.appspot.com/'
-BUTLER_MASTER_URL = 'http://alfred.boatyardapp.com/'
-BUTLER_VIRTUALENV = os.path.join(os.path.dirname(__file__), 'env')
-BUTLER_APPS_DIRECTORY = os.path.join(os.path.dirname(__file__), 'services')
-
-
+BUTLER_MASTER_URL = 'http://localhost:8000/'
+BUTLER_VIRTUALENV = os.path.abspath(os.path.join(os.path.dirname(__file__), 'env'))
+BUTLER_APPS_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), 'services'))
+BUTLER_MANAGE_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
 
